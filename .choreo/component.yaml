@@ -1,0 +1,26 @@
+schemaVersion: "1.2"
+endpoints:
+  - name: smart-transit-api
+    displayName: Smart Transit System Backend API
+    service:
+      basePath: /
+      port: 8080
+    type: REST
+    networkVisibilities:
+      - Project
+      - Public
+    schemaFilePath: openapi.yaml
+    # Health check configuration for Smart Transit System
+    healthCheck:
+      path: /health
+      interval: 30
+      timeout: 10
+
+# Environment configurations for Smart Transit System
+environmentConfigurations:
+  - name: PORT
+    value: "8080"
+  - name: GIN_MODE
+    value: "release"
+  - name: DATABASE_URL
+    value: "postgresql://postgres.trcxfmpwffrftzsaijjn:W5hRGg6LhYiudexy@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres"

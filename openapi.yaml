@@ -1,0 +1,187 @@
+openapi: 3.0.3
+info:
+  title: Smart Transit System - Backend API Service
+  description: |
+    The official backend API service for the Smart Transit System - an advanced bus booking and fleet management platform.
+
+    This service provides health check and monitoring endpoints for the comprehensive Smart Transit System that includes:
+    - Passenger Mobile App with advanced booking and lounge integration
+    - Bus Owner/Fleet Management App with comprehensive analytics
+    - Driver/Conductor Mobile App with trip operations and QR scanning
+    - Lounge Management App with route-based discovery
+    - Admin Web Dashboard with advanced system monitoring
+
+    Built on WSO2 Choreo Platform with Asgardeo authentication and PostgreSQL database.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 1.0.0
+externalDocs:
+  description: GitHub Repository - Smart Transit System Backend
+  url: https://github.com/BusLounge/sts-go-backend
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://api.smarttransit.buslounge.com
+    description: Production server (Choreo Platform)
+tags:
+  - name: health
+    description: Health check and system monitoring endpoints for Smart Transit System
+  - name: monitoring
+    description: System monitoring and readiness probes for production deployment
+paths:
+  /health:
+    summary: Smart Transit System health check endpoint
+    get:
+      summary: Get Smart Transit System service health status
+      operationId: GetHealth
+      tags:
+        - health
+      responses:
+        "200":
+          description: Smart Transit System service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /healthz:
+    summary: Container health check for Kubernetes/Choreo
+    get:
+      summary: Simple health check for container orchestration
+      operationId: GetHealthz
+      tags:
+        - monitoring
+      responses:
+        "200":
+          description: Service container is running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleHealthResponse"
+
+  /ready:
+    summary: Readiness probe with database connectivity check
+    get:
+      summary: Check if Smart Transit System service is ready to accept traffic
+      operationId: GetReadiness
+      tags:
+        - monitoring
+      responses:
+        "200":
+          description: Service is ready to handle requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadinessResponse"
+        "503":
+          description: Service is not ready (database connection issues)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadinessErrorResponse"
+
+  /health/db:
+    summary: Database health and connection pool status
+    get:
+      summary: Check PostgreSQL database connection health for Smart Transit System
+      operationId: GetDatabaseHealth
+      tags:
+        - health
+      responses:
+        "200":
+          description: Database is healthy and accessible
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DatabaseHealthResponse"
+        "503":
+          description: Database is unhealthy or unreachable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DatabaseHealthErrorResponse"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "healthy"
+        service:
+          type: string
+          example: "Smart Transit System Backend"
+        version:
+          type: string
+          example: "1.0.0"
+      required:
+        - status
+        - service
+        - version
+
+    SimpleHealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "ok"
+      required:
+        - status
+
+    ReadinessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "ready"
+        database:
+          type: string
+          example: "connected"
+      required:
+        - status
+        - database
+
+    ReadinessErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "not ready"
+        database:
+          type: string
+          example: "disconnected"
+      required:
+        - status
+        - database
+
+    DatabaseHealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "healthy"
+        service:
+          type: string
+          example: "database"
+      required:
+        - status
+        - service
+
+    DatabaseHealthErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "unhealthy"
+        service:
+          type: string
+          example: "database"
+        error:
+          type: string
+          example: "database ping failed"
+      required:
+        - status
+        - service
+        - error
